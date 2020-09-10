@@ -24,11 +24,14 @@ import androidx.annotation.NonNull;
 import com.huawei.hms.flutter.push.constants.Param;
 import com.huawei.hms.flutter.push.event.DataMessageStreamHandler;
 import com.huawei.hms.flutter.push.event.TokenStreamHandler;
+import com.huawei.hms.flutter.push.hms.FlutterHmsMessageService;
 import com.huawei.hms.flutter.push.utils.Utils;
 import com.huawei.hms.flutter.push.hms.FlutterHmsInstanceId;
 import com.huawei.hms.flutter.push.hms.FlutterHmsMessaging;
 import com.huawei.hms.flutter.push.constants.Method;
 import com.huawei.hms.flutter.push.constants.Channel;
+
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
@@ -60,8 +63,13 @@ public class PushPlugin implements FlutterPlugin, MethodCallHandler {
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), Channel.METHOD_CHANNEL.id());
         channel.setMethodCallHandler(this);
-        PushPlugin.setContext(flutterPluginBinding.getApplicationContext());
 
+        PushPlugin.setContext(flutterPluginBinding.getApplicationContext());
+        final MethodChannel backgroundCallbackChannel =
+                new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "plugins.flutter.io/hms_background");
+
+        backgroundCallbackChannel.setMethodCallHandler(this);
+        FlutterHmsMessageService.setBackgroundChannel(backgroundCallbackChannel);
         EventChannel tokenEventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), Channel.TOKEN_CHANNEL.id());
         tokenEventChannel.setStreamHandler(new TokenStreamHandler(context));
 
@@ -97,6 +105,19 @@ public class PushPlugin implements FlutterPlugin, MethodCallHandler {
                 break;
             case deleteAAID:
                 FlutterHmsInstanceId.deleteAAID(result);
+                break;
+            case setOnBackground:
+                Map<String, Long> callbacks = ((Map<String, Long>) call.arguments);
+                long backgroundHandle = callbacks.get("backgroundHandle");
+                long backgroundHandleDispatcher = callbacks.get("backgroundDispatcher");
+                FlutterHmsMessageService.setBackgroundMessageHandle(context, backgroundHandle);
+                FlutterHmsMessageService.setBackgroundMessageDispatcher(context, backgroundHandleDispatcher);
+                FlutterHmsMessageService.startBackgroundIsolate(context, backgroundHandleDispatcher);
+                result.success(true);
+                break;
+            case initialized:
+                FlutterHmsMessageService.onInitialized();
+                result.success(true);
                 break;
             default:
                 onMethodCallToken(call, result);

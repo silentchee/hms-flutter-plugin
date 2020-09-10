@@ -15,12 +15,42 @@ Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
 */
 
 import 'dart:async';
+import 'dart:ui';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import 'constants/method.dart' as Method;
 import 'constants/channel.dart' as Channel;
 import 'constants/code.dart';
+
+
+void _setBackgroundMessageHandle() async {
+    // Setup Flutter state needed for MethodChannels.
+    WidgetsFlutterBinding.ensureInitialized();
+      const MethodChannel _backgroundChannel =
+      MethodChannel('plugins.flutter.io/hms_background');
+
+    _backgroundChannel.setMethodCallHandler((MethodCall call) async {
+      if (call.method == 'handleBackgroundMessage') {
+        final CallbackHandle handle =
+            CallbackHandle.fromRawHandle(call.arguments['handle']);
+        final Function handlerFunction =
+            PluginUtilities.getCallbackFromHandle(handle);
+        try {
+          await handlerFunction(
+              {"data": json.decode(call.arguments['message'])});
+        } catch (e) {
+          print('Unable to handle incoming background message.');
+          print(e);
+        }
+        return Future<void>.value();
+      }
+    });
+
+    _backgroundChannel.invokeMethod<void>('initialized');
+}
 
 class Push {
   static const MethodChannel mChannel =
@@ -113,5 +143,22 @@ class Push {
 
     await mChannel.invokeMethod(Method.showToast, args);
     return null;
+  }
+
+  static setOnBackgroundMsgHandle(callback) {
+    final CallbackHandle backgroundMessageHandle =
+        PluginUtilities.getCallbackHandle(callback);
+    print(backgroundMessageHandle);
+
+    final CallbackHandle backgroundMessgeDispatcher =
+        PluginUtilities.getCallbackHandle(_setBackgroundMessageHandle);
+    print(backgroundMessgeDispatcher);
+    mChannel.invokeMethod(
+      'setOnBackground',
+      <String, dynamic>{
+        'backgroundDispatcher': backgroundMessgeDispatcher.toRawHandle(),
+        'backgroundHandle': backgroundMessageHandle.toRawHandle()
+      },
+    );
   }
 }

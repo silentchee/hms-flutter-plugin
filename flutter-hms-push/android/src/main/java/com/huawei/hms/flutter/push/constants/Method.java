@@ -37,6 +37,7 @@ public enum Method {
     isAutoInitEnabled,
 
     getAgConnectValues,
-    showToast;
-
+    showToast,
+    setOnBackground,
+    initialized;
 }
