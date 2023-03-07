@@ -25,7 +25,7 @@ import 'constants/method.dart' as Method;
 import 'constants/channel.dart' as Channel;
 import 'constants/code.dart';
 
-
+@pragma('vm:entry-point')
 void _setBackgroundMessageHandle() async {
     // Setup Flutter state needed for MethodChannels.
     WidgetsFlutterBinding.ensureInitialized();
