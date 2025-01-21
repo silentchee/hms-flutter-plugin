@@ -17,6 +17,7 @@ Copyright (c) Huawei Technologies Co., Ltd. 2012-2020. All rights reserved.
 package com.huawei.hms.flutter.push.utils;
 
 import android.content.Intent;
+import android.content.Context;
 
 import com.huawei.hms.flutter.push.PushPlugin;
 import com.huawei.hms.flutter.push.constants.PushIntent;
@@ -48,8 +49,11 @@ public class Utils {
         }
     }
 
-    public static void sendIntent(PushIntent action, PushIntent extraName, String result) {
+    public static void sendIntent(Context context, PushIntent action, PushIntent extraName, String result) {
         Intent intent = new Intent();
+        if(context!=null){
+            intent.setPackage(context.getPackageName());
+        }
         intent.setAction(action.id());
         intent.putExtra(extraName.id(), result);
         PushPlugin.getContext().sendBroadcast(intent);

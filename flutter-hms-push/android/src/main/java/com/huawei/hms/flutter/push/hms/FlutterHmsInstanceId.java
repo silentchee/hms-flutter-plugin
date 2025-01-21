@@ -70,11 +70,11 @@ public class FlutterHmsInstanceId {
             try {
                 token = HmsInstanceId.getInstance(PushPlugin.getContext()).getToken(appId, "HCM");
             } catch (ApiException e) {
-                Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
+                Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
             } catch (Exception e) {
-                Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
+                Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
             }
-            Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, token);
+            Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, token);
         }).start();
     }
 
@@ -100,11 +100,11 @@ public class FlutterHmsInstanceId {
             try {
                 HmsInstanceId.getInstance(PushPlugin.getContext()).deleteToken(appId, "HCM");
             } catch (ApiException e) {
-                Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
+                Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
             } catch (Exception e) {
-                Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
+                Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, e.getLocalizedMessage());
             }
-            Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, Code.RESULT_SUCCESS.code());
+            Utils.sendIntent(PushPlugin.getContext(), PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, Code.RESULT_SUCCESS.code());
         }).start();
     }
 

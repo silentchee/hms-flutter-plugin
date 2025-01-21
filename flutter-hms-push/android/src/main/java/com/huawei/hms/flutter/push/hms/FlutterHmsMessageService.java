@@ -93,7 +93,7 @@ public class FlutterHmsMessageService extends HmsMessageService {
     public void onNewToken(String token) {
         super.onNewToken(token);
         Log.d(TAG, "token received");
-        Utils.sendIntent(PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, token);
+        Utils.sendIntent(backgroundContext, PushIntent.TOKEN_INTENT_ACTION, PushIntent.TOKEN, token);
     }
     public static void setBackgroundMessageHandle(Context context, Long handle) {
 
@@ -156,7 +156,7 @@ public class FlutterHmsMessageService extends HmsMessageService {
         if (remoteMessage.getData().length() > 0) {
             Context context = getApplicationContext();
             if(isApplicationForeground(context)) {
-                Utils.sendIntent(PushIntent.DATA_MESSAGE_INTENT_ACTION, PushIntent.DATA_MESSAGE, remoteMessage.getData());
+                Utils.sendIntent(backgroundContext, PushIntent.DATA_MESSAGE_INTENT_ACTION, PushIntent.DATA_MESSAGE, remoteMessage.getData());
                 Log.d(TAG, "Message data received");
             }else{
                 if (!isIsolateRunning.get()) {
